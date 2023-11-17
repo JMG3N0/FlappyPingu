@@ -74,7 +74,8 @@ int main(void)
 	Rectangle playerSource = { 0,0,(float)player.width / 3,(float)player.height };
 	Rectangle playerDestination = { ballPosition.x,ballPosition.y,(float)player.width / 3 * 5, (float)player.height * 5 };
 	Vector2 origin = { playerDestination.width / 2, playerDestination.height / 2 };
-
+	Rectangle PlayerCollision = {};
+	(static_cast<int>(player.width) * 2 + 5, static_cast<int>(playerDestination.y - origin.y), static_cast<int>(playerDestination.width), static_cast<int>(playerDestination.height), RED);
 	float playerAnimationTime = 0.0f;
 	enum GameState {
 		MENU,
@@ -106,6 +107,7 @@ int main(void)
 		switch (gameState)
 		{
 		case MENU:
+			
 			if (IsKeyPressed(KEY_P)) {
 				gameState = PLAY;
 			}
@@ -170,6 +172,7 @@ int main(void)
 				CheckCollisionCircleRec(Vector2{ ballPosition.x, ballPosition.y }, ballRadius, lowerTube2);
 			playerDestination.x = ballPosition.x;
 			playerDestination.y = ballPosition.y;
+
 			break;
 
 		case CREDITS:
@@ -184,7 +187,6 @@ int main(void)
 
 			if (IsKeyDown(KEY_R))
 			{
-
 				ballPosition = { (float)screenWidth - 600, (float)screenHeight / 2 };
 				ballVelocityY = 0.0f;
 				collided = false;
@@ -214,6 +216,7 @@ int main(void)
 
 			if (IsKeyDown(KEY_B)) {
 
+				
 				gameState = MENU;
 
 
@@ -221,8 +224,9 @@ int main(void)
 
 				ballPosition = { (float)screenWidth - 600, (float)screenHeight / 2 };
 				ballVelocityY = 0.0f;
+				playerDestination.x = ballPosition.x;
+				playerDestination.y = ballPosition.y;
 				collided = false;
-
 
 				upperTube1.x = lowerTube1.x = static_cast<float>(GetScreenWidth());
 				upperTube2.x = lowerTube2.x = static_cast<float>(GetScreenWidth()) + screenWidth / 2;
@@ -280,7 +284,8 @@ int main(void)
 		DrawTextureEx(midground2, { scrollingMid2, 40 }, 0.0f, 2.0f, WHITE);
 		DrawTextureEx(midground2, { midground2.width * 2 + scrollingMid2, 40 }, 0.0f, 2.0f, WHITE);
 
-		DrawCircleV(ballPosition, ballRadius, MAROON);
+		//DrawCircleV(ballPosition, ballRadius, MAROON);
+		DrawRectangle(static_cast<int>(player.width)*2 + 5, static_cast<int>(playerDestination.y - origin.y), static_cast<int>(playerDestination.width), static_cast<int>(playerDestination.height), RED);
 
 		DrawTexturePro(player, playerSource, playerDestination, origin, 0, WHITE);
 

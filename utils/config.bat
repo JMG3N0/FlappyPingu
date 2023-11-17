@@ -2,7 +2,7 @@
 
 echo LLamando a Git Config
 
-git config user.email "tupacas1998@gmail.com"
-git config user.name "Tupac Sierra"
-
+git config user.email "joan.rivas.cepeda@gmail.com"
+git config user.name "JMG3N0"
+echo pause
 echo Git Configurado correctamente

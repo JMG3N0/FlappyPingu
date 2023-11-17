@@ -4,3 +4,4 @@ bin/
 .pdb/
 debug/
 Release/
+x64/
