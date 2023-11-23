@@ -58,7 +58,9 @@ int main(void)
 
 
 	Vector2 ballPosition = initialBallPosition;
+	Vector2 ballPositionP2 = initialBallPosition;
 	float ballVelocityY = 0.0f;
+	float ballVelocityP2Y = 0.0f;
 
 	Rectangle upperTube1 = { (float)screenWidth, 0.0f, tubeWidth, 0.0f };
 	Rectangle lowerTube1 = { (float)screenWidth, 0.0f, tubeWidth, 0.0f };
@@ -69,11 +71,25 @@ int main(void)
 
 	upperTube1.width = lowerTube1.width = upperTube2.width = lowerTube2.width = tubeWidth;
 
+	int scoreP1 = 0;
+	int scoreP2 = 0;
+
+	bool multiplayer = false;
+	bool startGame = false;
 
 	bool collided = false;
+	bool collidedP2 = false;
+	bool P1_Live = true;
+	bool P2_Live = true;
+
 	Rectangle playerSource = { 0,0,(float)player.width / 3,(float)player.height };
+
 	Rectangle playerDestination = { ballPosition.x,ballPosition.y,(float)player.width / 3 * 5, (float)player.height * 5 };
 	Vector2 origin = { playerDestination.width / 2, playerDestination.height / 2 };
+	
+	Rectangle player2Destination = { ballPositionP2.x,ballPositionP2.y,(float)player.width / 3 * 5, (float)player.height * 5 };
+	Vector2 originP2 = { player2Destination.width / 2, player2Destination.height / 2 };
+
 	Rectangle PlayerCollision = {};
 	(static_cast<int>(player.width) * 2 + 5, static_cast<int>(playerDestination.y - origin.y), static_cast<int>(playerDestination.width), static_cast<int>(playerDestination.height), RED);
 	float playerAnimationTime = 0.0f;
@@ -131,47 +147,140 @@ int main(void)
 
 		case PLAY:
 
-			if (ballPosition.y > screenHeight || collided) {
-				gameState = GAME_OVER;
+			if (startGame == false)
+			{
+				if (IsKeyPressed(KEY_KP_1)) 
+				{
+					multiplayer = false;
+				}
+				if (IsKeyPressed(KEY_KP_2)) 
+				{
+					multiplayer = true;
+				}
+				if (IsKeyPressed(KEY_ENTER))
+				{
+					startGame = true;
+				}
 			}
+			else
+			{
+			
+				if (multiplayer == true)
+				{
+					if (ballPosition.y > screenHeight || collided) {
+						P1_Live = false;
+					}
+					if (ballPositionP2.y > screenHeight || collidedP2) {
+						P2_Live = false;
+					}
 
-			if (IsKeyPressed(KEY_SPACE) && ballPosition.y > ballRadius) {
-				ballVelocityY = -jumpSpeed;
+					if (P1_Live == false && P2_Live == false)
+					{
+						gameState = GAME_OVER;
+					}
+				}
+				else
+				{
+					if (ballPosition.y > screenHeight || collided) {
+						gameState = GAME_OVER;
+					}
+				}
+
+				
+
+
+				if (IsKeyPressed(KEY_SPACE) && ballPosition.y > ballRadius) {
+					ballVelocityY = -jumpSpeed;
+				}
+
+				ballPosition.y += ballVelocityY * GetFrameTime();
+				ballVelocityY += gravity * GetFrameTime();
+
+
+				if (multiplayer == true)
+				{
+					if (IsKeyPressed(KEY_W) && ballPositionP2.y > ballRadius) {
+						ballVelocityP2Y = -jumpSpeed;
+					}
+
+					ballPositionP2.y += ballVelocityP2Y * GetFrameTime();
+					ballVelocityP2Y += gravity * GetFrameTime();
+				}
+
+
+				upperTube1.x = lowerTube1.x -= tubeSpeed * GetFrameTime();
+				upperTube2.x = lowerTube2.x -= tubeSpeed * GetFrameTime();
+
+				if (upperTube2.x + upperTube2.width <= 0) {
+					upperTube2.x = lowerTube2.x = static_cast<float>(GetScreenWidth());
+					float tubePosition = static_cast<float>(GetRandomValue(150, GetScreenHeight() - 200));
+					float gapHeight = static_cast<float>(GetRandomValue(60, 70));
+					float tubeHeight = static_cast<float>(GetScreenHeight()) - tubePosition + gapHeight;
+					upperTube2.height = tubePosition - gapHeight;
+					lowerTube2.y = tubePosition + gapHeight;
+					lowerTube2.height = tubeHeight;
+
+					if (multiplayer == true)
+					{
+						if (P1_Live == true)
+						{
+							scoreP1++;
+						}
+						if (P2_Live == true)
+						{
+							scoreP2++;
+						}
+					}
+					else
+					{	
+						scoreP1++;
+					}
+
+				}
+
+				if (upperTube1.x + upperTube1.width <= 0) {
+					upperTube1.x = lowerTube1.x = static_cast<float>(GetScreenWidth());
+					float tubePosition = static_cast<float>(GetRandomValue(150, GetScreenHeight() - 200));
+					float gapHeight = static_cast<float>(GetRandomValue(60, 70));
+					float tubeHeight = static_cast<float>(GetScreenHeight()) - tubePosition + gapHeight;
+					upperTube1.height = tubePosition - gapHeight;
+					lowerTube1.y = tubePosition + gapHeight;
+					lowerTube1.height = tubeHeight;
+
+					if (multiplayer == true)
+					{
+						if (P1_Live == true)
+						{
+							scoreP1++;
+						}
+						if (P2_Live == true)
+						{
+							scoreP2++;
+						}
+					}
+					else
+					{
+						scoreP1++;
+					}
+				}
+
+				collided = CheckCollisionCircleRec(Vector2{ ballPosition.x, ballPosition.y }, ballRadius, upperTube1) ||
+					CheckCollisionCircleRec(Vector2{ ballPosition.x, ballPosition.y }, ballRadius, lowerTube1) ||
+					CheckCollisionCircleRec(Vector2{ ballPosition.x, ballPosition.y }, ballRadius, upperTube2) ||
+					CheckCollisionCircleRec(Vector2{ ballPosition.x, ballPosition.y }, ballRadius, lowerTube2);
+				playerDestination.x = ballPosition.x;
+				playerDestination.y = ballPosition.y;
+
+				if (multiplayer == true)
+				{
+					collidedP2 = CheckCollisionCircleRec(Vector2{ ballPositionP2.x, ballPositionP2.y }, ballRadius, upperTube1) ||
+						CheckCollisionCircleRec(Vector2{ ballPositionP2.x, ballPositionP2.y }, ballRadius, lowerTube1) ||
+						CheckCollisionCircleRec(Vector2{ ballPositionP2.x, ballPositionP2.y }, ballRadius, upperTube2) ||
+						CheckCollisionCircleRec(Vector2{ ballPositionP2.x, ballPositionP2.y }, ballRadius, lowerTube2);
+					player2Destination.x = ballPositionP2.x;
+					player2Destination.y = ballPositionP2.y;
+				}
 			}
-
-			ballPosition.y += ballVelocityY * GetFrameTime();
-			ballVelocityY += gravity * GetFrameTime();
-
-			upperTube1.x = lowerTube1.x -= tubeSpeed * GetFrameTime();
-			upperTube2.x = lowerTube2.x -= tubeSpeed * GetFrameTime();
-
-			if (upperTube2.x + upperTube2.width <= 0) {
-				upperTube2.x = lowerTube2.x = static_cast<float>(GetScreenWidth());
-				float tubePosition = static_cast<float>(GetRandomValue(150, GetScreenHeight() - 200));
-				float gapHeight = static_cast<float>(GetRandomValue(60, 70));
-				float tubeHeight = static_cast<float>(GetScreenHeight()) - tubePosition + gapHeight;
-				upperTube2.height = tubePosition - gapHeight;
-				lowerTube2.y = tubePosition + gapHeight;
-				lowerTube2.height = tubeHeight;
-
-			}
-
-			if (upperTube1.x + upperTube1.width <= 0) {
-				upperTube1.x = lowerTube1.x = static_cast<float>(GetScreenWidth());
-				float tubePosition = static_cast<float>(GetRandomValue(150, GetScreenHeight() - 200));
-				float gapHeight = static_cast<float>(GetRandomValue(60, 70));
-				float tubeHeight = static_cast<float>(GetScreenHeight()) - tubePosition + gapHeight;
-				upperTube1.height = tubePosition - gapHeight;
-				lowerTube1.y = tubePosition + gapHeight;
-				lowerTube1.height = tubeHeight;
-			}
-
-			collided = CheckCollisionCircleRec(Vector2{ ballPosition.x, ballPosition.y }, ballRadius, upperTube1) ||
-				CheckCollisionCircleRec(Vector2{ ballPosition.x, ballPosition.y }, ballRadius, lowerTube1) ||
-				CheckCollisionCircleRec(Vector2{ ballPosition.x, ballPosition.y }, ballRadius, upperTube2) ||
-				CheckCollisionCircleRec(Vector2{ ballPosition.x, ballPosition.y }, ballRadius, lowerTube2);
-			playerDestination.x = ballPosition.x;
-			playerDestination.y = ballPosition.y;
 
 			break;
 
@@ -190,7 +299,16 @@ int main(void)
 				ballPosition = { (float)screenWidth - 600, (float)screenHeight / 2 };
 				ballVelocityY = 0.0f;
 				collided = false;
+				P1_Live = true;
+				scoreP1 = 0;
+				
+				ballPositionP2 = { (float)screenWidth - 600, (float)screenHeight / 2 };
+				ballVelocityP2Y = 0.0f;
+				collidedP2 = false;
+				P2_Live = true;
+				scoreP2 = 0;
 
+				
 
 				upperTube1.x = lowerTube1.x = static_cast<float>(GetScreenWidth());
 				upperTube2.x = lowerTube2.x = static_cast<float>(GetScreenWidth()) + screenWidth / 2;
@@ -216,7 +334,10 @@ int main(void)
 
 			if (IsKeyDown(KEY_B)) {
 
-				
+				startGame = false;
+				multiplayer = false;
+				scoreP1 = 0;
+				scoreP2 = 0;
 				gameState = MENU;
 
 
@@ -227,6 +348,12 @@ int main(void)
 				playerDestination.x = ballPosition.x;
 				playerDestination.y = ballPosition.y;
 				collided = false;
+				
+				ballPositionP2 = { (float)screenWidth - 600, (float)screenHeight / 2 };
+				ballVelocityP2Y = 0.0f;
+				player2Destination.x = ballPositionP2.x;
+				player2Destination.y = ballPositionP2.y;
+				collidedP2 = false;
 
 				upperTube1.x = lowerTube1.x = static_cast<float>(GetScreenWidth());
 				upperTube2.x = lowerTube2.x = static_cast<float>(GetScreenWidth()) + screenWidth / 2;
@@ -285,9 +412,17 @@ int main(void)
 		DrawTextureEx(midground2, { midground2.width * 2 + scrollingMid2, 40 }, 0.0f, 2.0f, WHITE);
 
 		//DrawCircleV(ballPosition, ballRadius, MAROON);
-		DrawRectangle(static_cast<int>(player.width)*2 + 5, static_cast<int>(playerDestination.y - origin.y), static_cast<int>(playerDestination.width), static_cast<int>(playerDestination.height), RED);
+		//Future Collision  DrawRectangle(static_cast<int>(player.width)*2 + 5, static_cast<int>(playerDestination.y - origin.y), static_cast<int>(playerDestination.width), static_cast<int>(playerDestination.height), RED);
 
-		DrawTexturePro(player, playerSource, playerDestination, origin, 0, WHITE);
+		if (multiplayer == true)
+		{
+			DrawTexturePro(player, playerSource, player2Destination, originP2, 0, BLUE); //P2
+			DrawTexturePro(player, playerSource, playerDestination, origin, 0, RED); //P1
+		}
+		else
+		{
+			DrawTexturePro(player, playerSource, playerDestination, origin, 0, WHITE);
+		}
 
 		DrawRectangleRec(upperTube1, BLUE);
 		DrawRectangleRec(lowerTube1, BLUE);
@@ -313,7 +448,29 @@ int main(void)
 			break;
 
 		case PLAY:
-
+			if (startGame == false)
+			{
+				DrawText("How many people are playing ?", screenWidth / 2 - 150, screenHeight / 2 - 20, 20, WHITE);
+				DrawText("Press the number in the Keypad", screenWidth / 2 - 150, screenHeight / 2 + 20, 20, WHITE);
+				if (multiplayer == false)
+				{
+					DrawText("Currently: 1", screenWidth / 2 - 150, screenHeight / 2 + 60, 20, WHITE);
+				}
+				else
+				{
+					DrawText("Currently: 2", screenWidth / 2 - 150, screenHeight / 2 + 60, 20, WHITE);
+				}
+				DrawText("Player 1 is Red - Player 2 is Blue", screenWidth / 2 - 150, screenHeight / 2 + 100, 20, WHITE);
+				DrawText("Press Enter when you are done selecting...", screenWidth / 2 - 150, screenHeight / 2 + 140, 20, WHITE);
+			}
+			else
+			{
+				DrawText(TextFormat("P1 Score: %i", scoreP1), 1, 1, 20, WHITE);
+				if (multiplayer == true)
+				{
+					DrawText(TextFormat("P2 Score: %i", scoreP2), 630, 1, 20, WHITE);
+				}
+			}
 			break;
 
 		case CREDITS:
@@ -324,9 +481,10 @@ int main(void)
 
 		case HOW_TO_PLAY:
 			DrawText("How To Play", screenWidth / 2 - 70, screenHeight / 2 - 80, 30, WHITE);
-			DrawText("Press SPACE to make the penguin fly", screenWidth / 2 - 150, screenHeight / 2 - 20, 20, WHITE);
-			DrawText("Avoid the pipes and try to stay alive!", screenWidth / 2 - 150, screenHeight / 2 + 20, 20, WHITE);
-			DrawText("Press B to go back to the main menu.", screenWidth / 2 - 150, screenHeight / 2 + 60, 20, WHITE);
+			DrawText("Player 1 press SPACE to make the penguin fly", screenWidth / 2 - 150, screenHeight / 2 - 20, 20, WHITE);
+			DrawText("Player 2 press W to make the penguin fly", screenWidth / 2 - 150, screenHeight / 2 + 20, 20, WHITE);
+			DrawText("Avoid the pipes and try to stay alive!", screenWidth / 2 - 150, screenHeight / 2 + 60, 20, WHITE);
+			DrawText("Press B to go back to the main menu.", screenWidth / 2 - 150, screenHeight / 2 + 100, 20, WHITE);
 
 			break;
 		case EXIT:
@@ -337,8 +495,17 @@ int main(void)
 			ClearBackground(GetColor(0x052c46ff));
 
 			DrawText("You lose", screenWidth / 2 - 80, screenHeight / 2 - 20, 35, RED);
-			DrawText("Press R to replay", screenWidth / 2 - 100, screenHeight / 2 + 20, 20, WHITE);
-			DrawText("Press B to go back to the menu", screenWidth / 2 - 160, screenHeight / 2 + 60, 20, WHITE);
+			if (multiplayer == true)
+			{
+				DrawText(TextFormat("P1 Score: %i", scoreP1), screenWidth / 2 - 210, screenHeight / 2 + 20, 35, WHITE);
+				DrawText(TextFormat(" - P2 Score: %i", scoreP2), screenWidth / 2 - 20, screenHeight / 2 + 20, 35, WHITE);
+			}
+			else
+			{
+				DrawText(TextFormat("Your Score: %i", scoreP1), screenWidth / 2 - 80, screenHeight / 2 + 20, 35, WHITE);
+			}
+			DrawText("Press R to replay", screenWidth / 2 - 100, screenHeight / 2 + 60, 20, WHITE);
+			DrawText("Press B to go back to the menu", screenWidth / 2 - 160, screenHeight / 2 + 100, 20, WHITE);
 
 			break;
 
