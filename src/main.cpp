@@ -1,24 +1,4 @@
-#include "raylib.h"
-
-const int screenWidth = 750;
-const int screenHeight = 450;
-
-
-const char* backgroundPath = "res/layers/sky.png";
-const char* playerPath = "res/player.png";
-const char* background2Path = "res/layers/cloud_lonely.png";
-const char* background3Path = "res/layers/clouds_bg.png";
-const char* midgroundPath = "res/layers/glacial_mountains_lightened.png";
-const char* midground2Path = "res/layers/clouds_mg_2.png";
-const char* foregroundPath = "res/layers/clouds_mg_1_lightened.png";
-
-
-const float scrollingBackSpeed = 0.1f;
-const float scrollingBack2Speed = 20.0f;
-const float scrollingBack3Speed = 35.0f;
-const float scrollingMidSpeed = 70.0f;
-const float scrollingMid2Speed = 85.0f;
-const float scrollingForeSpeed = 130.0f;
+#include "Globals.h"
 
 const float gravity = 650.0f;
 const float jumpSpeed = 200.0f;
@@ -33,21 +13,11 @@ const Vector2 initialBallPosition = { (float)screenWidth - 600, (float)screenHei
 
 const int tubeSpawnDistance = screenWidth / 2;
 
-
-
 int main(void)
 {
+
 	InitWindow(screenWidth, screenHeight, "FlappyPingu");
-
-
-	Texture2D player = LoadTexture(playerPath);
-	Texture2D background = LoadTexture(backgroundPath);
-	Texture2D background2 = LoadTexture(background2Path);
-	Texture2D background3 = LoadTexture(background3Path);
-	Texture2D midground = LoadTexture(midgroundPath);
-	Texture2D midground2 = LoadTexture(midground2Path);
-	Texture2D foreground = LoadTexture(foregroundPath);
-
+	initTextures();
 
 	float scrollingBack = 0.0f;
 	float scrollingBack2 = 0.0f;
@@ -55,7 +25,6 @@ int main(void)
 	float scrollingMid = 0.0f;
 	float scrollingMid2 = 0.0f;
 	float scrollingFore = 0.0f;
-
 
 	Vector2 ballPosition = initialBallPosition;
 	Vector2 ballPositionP2 = initialBallPosition;
@@ -82,16 +51,16 @@ int main(void)
 	bool P1_Live = true;
 	bool P2_Live = true;
 
-	Rectangle playerSource = { 0,0,(float)player.width / 3,(float)player.height };
+	Rectangle playerSource = { 0,0,(float)Player.width / 3,(float)Player.height };
 
-	Rectangle playerDestination = { ballPosition.x,ballPosition.y,(float)player.width / 3 * 5, (float)player.height * 5 };
+	Rectangle playerDestination = { ballPosition.x,ballPosition.y,(float)Player.width / 3 * 5, (float)Player.height * 5 };
 	Vector2 origin = { playerDestination.width / 2, playerDestination.height / 2 };
 	
-	Rectangle player2Destination = { ballPositionP2.x,ballPositionP2.y,(float)player.width / 3 * 5, (float)player.height * 5 };
+	Rectangle player2Destination = { ballPositionP2.x,ballPositionP2.y,(float)Player.width / 3 * 5, (float)Player.height * 5 };
 	Vector2 originP2 = { player2Destination.width / 2, player2Destination.height / 2 };
 
 	Rectangle PlayerCollision = {};
-	(static_cast<int>(player.width) * 2 + 5, static_cast<int>(playerDestination.y - origin.y), static_cast<int>(playerDestination.width), static_cast<int>(playerDestination.height), RED);
+	(static_cast<int>(Player.width) * 2 + 5, static_cast<int>(playerDestination.y - origin.y), static_cast<int>(playerDestination.width), static_cast<int>(playerDestination.height), RED);
 	float playerAnimationTime = 0.0f;
 	enum GameState {
 		MENU,
@@ -112,7 +81,7 @@ int main(void)
 		{
 
 			playerSource.x += playerSource.width;
-			if (playerSource.x >= player.width)
+			if (playerSource.x >= Player.width)
 			{
 				playerSource.x = 0;
 			}
@@ -385,43 +354,43 @@ int main(void)
 		scrollingFore -= scrollingForeSpeed * GetFrameTime();
 
 
-		if (scrollingBack <= -background.width * 2) scrollingBack = 0;
-		if (scrollingBack2 <= -background2.width * 2) scrollingBack2 = 0;
-		if (scrollingBack3 <= -background3.width * 2) scrollingBack3 = 0;
-		if (scrollingMid <= -midground.width * 2) scrollingMid = 0;
-		if (scrollingMid2 <= -midground2.width * 2) scrollingMid2 = 0;
-		if (scrollingFore <= -foreground.width * 2) scrollingFore = 0;
+		if (scrollingBack <= -backGround.width * 2) scrollingBack = 0;
+		if (scrollingBack2 <= -backGround2.width * 2) scrollingBack2 = 0;
+		if (scrollingBack3 <= -backGround3.width * 2) scrollingBack3 = 0;
+		if (scrollingMid <= -midGround.width * 2) scrollingMid = 0;
+		if (scrollingMid2 <= -midGround2.width * 2) scrollingMid2 = 0;
+		if (scrollingFore <= -foreGround.width * 2) scrollingFore = 0;
 
 		BeginDrawing();
 
 		ClearBackground(GetColor(0x052c46ff));
 
-		DrawTextureEx(background, { scrollingBack , 20 }, 0.0f, 2.0f, WHITE);
-		DrawTextureEx(background, { background.width * 2 + scrollingBack, 20 }, 0.0f, 2.0f, WHITE);
+		DrawTextureEx(backGround, { scrollingBack , 20 }, 0.0f, 2.0f, WHITE);
+		DrawTextureEx(backGround, { backGround.width * 2 + scrollingBack, 20 }, 0.0f, 2.0f, WHITE);
 
-		DrawTextureEx(background2, { scrollingBack2 , 20 }, 0.0f, 2.0f, WHITE);
-		DrawTextureEx(background2, { background2.width * 2 + scrollingBack2, 20 }, 0.0f, 2.0f, WHITE);
+		DrawTextureEx(backGround2, { scrollingBack2 , 20 }, 0.0f, 2.0f, WHITE);
+		DrawTextureEx(backGround2, { backGround2.width * 2 + scrollingBack2, 20 }, 0.0f, 2.0f, WHITE);
 
-		DrawTextureEx(background3, { scrollingBack3 , 20 }, 0.0f, 2.0f, WHITE);
-		DrawTextureEx(background3, { background3.width * 2 + scrollingBack3, 20 }, 0.0f, 2.0f, WHITE);
+		DrawTextureEx(backGround3, { scrollingBack3 , 20 }, 0.0f, 2.0f, WHITE);
+		DrawTextureEx(backGround3, { backGround3.width * 2 + scrollingBack3, 20 }, 0.0f, 2.0f, WHITE);
 
-		DrawTextureEx(midground, { scrollingMid, 40 }, 0.0f, 2.0f, WHITE);
-		DrawTextureEx(midground, { midground.width * 2 + scrollingMid, 40 }, 0.0f, 2.0f, WHITE);
+		DrawTextureEx(midGround, { scrollingMid, 40 }, 0.0f, 2.0f, WHITE);
+		DrawTextureEx(midGround, { midGround.width * 2 + scrollingMid, 40 }, 0.0f, 2.0f, WHITE);
 
-		DrawTextureEx(midground2, { scrollingMid2, 40 }, 0.0f, 2.0f, WHITE);
-		DrawTextureEx(midground2, { midground2.width * 2 + scrollingMid2, 40 }, 0.0f, 2.0f, WHITE);
+		DrawTextureEx(midGround2, { scrollingMid2, 40 }, 0.0f, 2.0f, WHITE);
+		DrawTextureEx(midGround2, { midGround2.width * 2 + scrollingMid2, 40 }, 0.0f, 2.0f, WHITE);
 
 		//DrawCircleV(ballPosition, ballRadius, MAROON);
-		//Future Collision  DrawRectangle(static_cast<int>(player.width)*2 + 5, static_cast<int>(playerDestination.y - origin.y), static_cast<int>(playerDestination.width), static_cast<int>(playerDestination.height), RED);
+	    //DrawRectangle(static_cast<int>(player.width)*2 + 5, static_cast<int>(playerDestination.y - origin.y), static_cast<int>(playerDestination.width), static_cast<int>(playerDestination.height), RED);
 
 		if (multiplayer == true)
 		{
-			DrawTexturePro(player, playerSource, player2Destination, originP2, 0, BLUE); //P2
-			DrawTexturePro(player, playerSource, playerDestination, origin, 0, RED); //P1
+			DrawTexturePro(Player, playerSource, player2Destination, originP2, 0, BLUE); //P2
+			DrawTexturePro(Player, playerSource, playerDestination, origin, 0, RED); //P1
 		}
 		else
 		{
-			DrawTexturePro(player, playerSource, playerDestination, origin, 0, WHITE);
+			DrawTexturePro(Player, playerSource, playerDestination, origin, 0, WHITE);
 		}
 
 		DrawRectangleRec(upperTube1, BLUE);
@@ -430,8 +399,8 @@ int main(void)
 		DrawRectangleRec(upperTube2, BLUE);
 		DrawRectangleRec(lowerTube2, BLUE);
 
-		DrawTextureEx(foreground, { scrollingFore, 50 }, 0.0f, 2.0f, WHITE);
-		DrawTextureEx(foreground, { foreground.width * 2 + scrollingFore, 50 }, 0.0f, 2.0f, WHITE);
+		DrawTextureEx(foreGround, { scrollingFore, 50 }, 0.0f, 2.0f, WHITE);
+		DrawTextureEx(foreGround, { foreGround.width * 2 + scrollingFore, 50 }, 0.0f, 2.0f, WHITE);
 
 
 		switch (gameState)
@@ -442,7 +411,7 @@ int main(void)
 			DrawText("Press H for How To Play", screenWidth / 2 - 110, screenHeight / 2 + 60, 20, WHITE);
 			DrawText("Press ESC to Exit", screenWidth / 2 - 80, screenHeight / 2 + 100, 20, WHITE);
 
-			DrawText("Version 0.2 Flappy_Pingu", 10, 435, 15, BLACK);
+			DrawText("Version 0.3 Flappy_Pingu", 10, 435, 15, BLACK);
 
 			DrawText("Flappy Pingu", screenWidth / 2 - 120, screenHeight / 2 - 80, 40, WHITE);
 			break;
@@ -475,8 +444,9 @@ int main(void)
 
 		case CREDITS:
 			DrawText("Game Code by Tupac Sierra", screenWidth / 2 - 100, screenHeight / 2 - 20, 20, WHITE);
-			DrawText("Art background by @vnitti_art ", screenWidth / 2 - 125, screenHeight / 2 + 20, 20, WHITE);
-			DrawText("Press B to go back to the main menu.", screenWidth / 2 - 160, screenHeight / 2 + 60, 20, WHITE);
+			DrawText("Game Code by Joan Manuel Rivas", screenWidth / 2 - 100, screenHeight / 2 + 20, 20, WHITE);
+			DrawText("Art background by @vnitti_art ", screenWidth / 2 - 125, screenHeight / 2 + 60, 20, WHITE);
+			DrawText("Press B to go back to the main menu.", screenWidth / 2 - 160, screenHeight / 2 + 100, 20, WHITE);
 			break;
 
 		case HOW_TO_PLAY:
@@ -516,11 +486,7 @@ int main(void)
 		EndDrawing();
 	}
 
-
-	UnloadTexture(background);
-	UnloadTexture(midground);
-	UnloadTexture(foreground);
-	UnloadTexture(player);
+	unloadTextures();
 
 	CloseWindow();
 

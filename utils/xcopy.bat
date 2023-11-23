@@ -1,9 +1,3 @@
-@echo off
-
-echo copiando carpeta res en la carpeta release
-
-cd %1
-mkdir res
-xcopy %2 %3 /s /i /y
-
-echo Copiado correctamente
+xcopy "%CD%\res" "%CD%\bin\Debug\res" /y /i /s
+xcopy "%CD%\res" "%CD%\bin\Release\res" /y /i /s
+ 
